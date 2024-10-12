@@ -63,6 +63,38 @@ public class ContaServiceTest {
 		assertEquals(0.0, novaConta.getSaldo());
 		verify(contaRepository, times(1)).save(any(Conta.class));
 	}
+	
+    @Test
+    public void testVisualizarConta() {
+        Long contaId = 1L;
+        Conta conta = new Conta();
+        conta.setId(contaId);
+        conta.setTitular("Titular Test");
+        conta.setSaldo(100.0);
+
+        when(contaRepository.findById(contaId)).thenReturn(Optional.of(conta));
+
+        Conta resultado = contaService.visualizarConta(contaId);
+
+        assertNotNull(resultado);
+        assertEquals("Titular Test", resultado.getTitular());
+        assertEquals(100.0, resultado.getSaldo());
+        verify(contaRepository, times(1)).findById(contaId);
+    }
+
+    @Test
+    public void testVisualizarContaNoExistente() {
+        Long contaId = 1L;
+
+        when(contaRepository.findById(contaId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            contaService.visualizarConta(contaId);
+        });
+
+        assertEquals("Account not found: " + contaId, exception.getMessage());
+        verify(contaRepository, times(1)).findById(contaId);
+    }
 
 	@Test
 	public void testCreditar() {

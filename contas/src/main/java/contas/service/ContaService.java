@@ -20,6 +20,11 @@ public class ContaService {
 		conta.setSaldo(0.0);
 		return contaRepository.save(conta);
 	}
+	
+	@Transactional
+	public Conta visualizarConta(Long id) {
+	    return contaRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found: " + id));
+	}
 
 	@Transactional
 	public void creditar(Long id, double valor) {

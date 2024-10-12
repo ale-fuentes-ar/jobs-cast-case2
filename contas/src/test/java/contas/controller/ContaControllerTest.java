@@ -5,6 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,6 +53,38 @@ public class ContaControllerTest {
 
 		verify(contaService, times(1)).criaConta("Titular Test");
 	}
+	
+    @Test
+    public void testVisualizarConta() throws Exception {
+        Long contaId = 1L;
+        Conta conta = new Conta();
+        conta.setId(contaId);
+        conta.setTitular("Titular Test");
+        conta.setSaldo(100.0);
+
+        when(contaService.visualizarConta(contaId)).thenReturn(conta);
+
+        mockMvc.perform(get("/contas/{id}", contaId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.titular").value("Titular Test"))
+                .andExpect(jsonPath("$.saldo").value(100.0));
+
+        verify(contaService, times(1)).visualizarConta(contaId);
+    }
+
+    @Test
+    public void testVisualizarContaNoExistente() throws Exception {
+        Long contaId = 1L;
+
+        when(contaService.visualizarConta(contaId)).thenThrow(new RuntimeException("Account not found: " + contaId));
+
+        mockMvc.perform(get("/contas/{id}", contaId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(contaService, times(1)).visualizarConta(contaId);
+    }
 
 	@Test
 	public void testCreditar() throws Exception {
