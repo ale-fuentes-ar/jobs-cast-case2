@@ -18,6 +18,19 @@
 2- Validar as operações (ex.: não permitir transferências ou débitos que
 deixem a conta com saldo negativo).
 
+### Modelo
+
+```mermaid
+classDiagram
+	class Account {
+		-int id 
+		-String titular
+		-float saldo
+	}
+	
+	style Account fill:#cdcdcd,stroke-width:0px
+```
+
 ### Testando 
 
 observação | REST | url |
