@@ -36,15 +36,7 @@ classDiagram
 observação | REST | url |
 -|-|-
 crear conta | POST | http://localhost:8091/contas?titular=cast-case
-
-
-observação | REST | url |
--|-|-
 consultar conta | GET | http://localhost:8091/contas/1
-
-
-observação | REST | url |
--|-|-
 creditar | POST | http://localhost:8091/contas/1/creditar
 
 > Body (form-data): <br>
