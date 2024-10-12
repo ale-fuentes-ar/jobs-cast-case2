@@ -3,7 +3,7 @@
 
 <img src="https://img.shields.io/badge/Java_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
 
-## Project
+## CASE 2
 
 
 #### Requisitos não funcionais
@@ -31,7 +31,7 @@ classDiagram
 	style Account fill:#cdcdcd,stroke-width:0px
 ```
 
-### Testando 
+## Testando 
 
 observação | REST | url |
 -|-|-
@@ -51,7 +51,7 @@ debitar | POST | POST http://localhost:8091/contas/1/debitar
 
 
 
-### Visualizar H2 console
+## Visualizar H2 console
 
 link [h2-console][link-h2]
 * JDBC URL : jdbc:h2:mem:contacastdb
