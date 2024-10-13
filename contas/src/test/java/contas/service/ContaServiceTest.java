@@ -98,82 +98,89 @@ public class ContaServiceTest {
 
 	@Test
 	public void testCreditar() {
-		when(contaRepository.findById(1L)).thenReturn(Optional.of(contaOrigem));
-		when(contaRepository.save(contaOrigem)).thenReturn(contaOrigem);
+		when(contaRepository.findByIdWithLock(1L)).thenReturn(Optional.of(contaOrigem)); 
+	    when(contaRepository.save(contaOrigem)).thenReturn(contaOrigem);
 
-		contaService.creditar(1L, 100.0);
+	    contaOrigem.setSaldo(200.0); 
+	    contaService.creditar(1L, 100.0);
 
-		assertEquals(300.0, contaOrigem.getSaldo());
-		verify(contaRepository, times(1)).findById(1L);
-		verify(contaRepository, times(1)).save(contaOrigem);
+	    assertEquals(300.0, contaOrigem.getSaldo()); 
+	    verify(contaRepository, times(1)).findByIdWithLock(1L);
+	    verify(contaRepository, times(1)).save(contaOrigem); 
 	}
 
 	@Test
 	public void testDebitar() {
-		when(contaRepository.findById(1L)).thenReturn(Optional.of(contaOrigem));
-		when(contaRepository.save(contaOrigem)).thenReturn(contaOrigem);
+	    contaOrigem.setSaldo(200.0); 
+	    when(contaRepository.findByIdWithLock(1L)).thenReturn(Optional.of(contaOrigem)); 
+	    when(contaRepository.save(contaOrigem)).thenReturn(contaOrigem);
 
-		contaService.debitar(1L, 100.0);
+	    contaService.debitar(1L, 100.0); 
 
-		assertEquals(100.0, contaOrigem.getSaldo());
-		verify(contaRepository, times(1)).findById(1L);
-		verify(contaRepository, times(1)).save(contaOrigem);
+	    assertEquals(100.0, contaOrigem.getSaldo()); 
+	    verify(contaRepository, times(1)).findByIdWithLock(1L);
+	    verify(contaRepository, times(1)).save(contaOrigem); 
 	}
 
 	@Test
 	public void testDebitar_SaldoInsuficiente() {
-		when(contaRepository.findById(1L)).thenReturn(Optional.of(contaOrigem));
+	    when(contaRepository.findByIdWithLock(1L)).thenReturn(Optional.of(contaOrigem)); 
+	    contaOrigem.setSaldo(200.0); 
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			contaService.debitar(1L, 300.0);
-		});
+	    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+	        contaService.debitar(1L, 300.0); 
+	    });
 
-		assertEquals("Saldo insuficiente!", exception.getMessage());
-		verify(contaRepository, times(1)).findById(1L);
-		verify(contaRepository, never()).save(any(Conta.class));
+	    assertEquals("Saldo insuficiente!", exception.getMessage());
+	    verify(contaRepository, times(1)).findByIdWithLock(1L); 
+	    verify(contaRepository, never()).save(any(Conta.class)); 
 	}
 
 	@Test
 	public void testTransferir() {
-		when(contaRepository.findById(1L)).thenReturn(Optional.of(contaOrigem));
-		when(contaRepository.findById(2L)).thenReturn(Optional.of(contaDestino));
-		when(contaRepository.save(contaOrigem)).thenReturn(contaOrigem);
-		when(contaRepository.save(contaDestino)).thenReturn(contaDestino);
+	    when(contaRepository.findByIdWithLock(1L)).thenReturn(Optional.of(contaOrigem));
+	    when(contaRepository.findByIdWithLock(2L)).thenReturn(Optional.of(contaDestino));
+	    when(contaRepository.save(contaOrigem)).thenReturn(contaOrigem);
+	    when(contaRepository.save(contaDestino)).thenReturn(contaDestino);
 
-		contaService.transferir(1L, 2L, 100.0);
+	    contaOrigem.setSaldo(200.0);
+	    contaDestino.setSaldo(0.0);
 
-		assertEquals(100.0, contaOrigem.getSaldo());
-		assertEquals(100.0, contaDestino.getSaldo());
-		verify(contaRepository, times(2)).findById(1L);
-		verify(contaRepository, times(2)).findById(2L);
-		verify(contaRepository, times(2)).save(any(Conta.class));
+	    contaService.transferir(1L, 2L, 100.0);
+
+	    assertEquals(100.0, contaOrigem.getSaldo()); 
+	    assertEquals(100.0, contaDestino.getSaldo());
+	    verify(contaRepository, times(2)).findByIdWithLock(1L); 
+	    verify(contaRepository, times(2)).findByIdWithLock(2L); 
+	    verify(contaRepository, times(1)).save(contaOrigem); 
+	    verify(contaRepository, times(1)).save(contaDestino);
 	}
 
 	@Test
 	public void testTransferir_ContaOrigemInexistente() {
-		when(contaRepository.findById(1L)).thenReturn(Optional.empty());
+	    when(contaRepository.findByIdWithLock(1L)).thenReturn(Optional.empty());
 
-		Exception exception = assertThrows(RuntimeException.class, () -> {
-			contaService.transferir(1L, 2L, 100.0);
-		});
+	    Exception exception = assertThrows(RuntimeException.class, () -> {
+	        contaService.transferir(1L, 2L, 100.0);
+	    });
 
-		assertEquals("Account not found: 1", exception.getMessage());
-		verify(contaRepository, times(1)).findById(1L);
-		verify(contaRepository, never()).findById(2L);
+	    assertEquals("Account not found: 1", exception.getMessage());
+	    verify(contaRepository, times(1)).findByIdWithLock(1L); 
+	    verify(contaRepository, never()).findByIdWithLock(2L);
 	}
 
 	@Test
 	public void testTransferir_ContaDestinoInexistente() {
-		when(contaRepository.findById(1L)).thenReturn(Optional.of(contaOrigem));
-		when(contaRepository.findById(2L)).thenReturn(Optional.empty());
+	    when(contaRepository.findByIdWithLock(1L)).thenReturn(Optional.of(contaOrigem));
+	    when(contaRepository.findByIdWithLock(2L)).thenReturn(Optional.empty());
 
-		Exception exception = assertThrows(RuntimeException.class, () -> {
-			contaService.transferir(1L, 2L, 100.0);
-		});
+	    Exception exception = assertThrows(RuntimeException.class, () -> {
+	        contaService.transferir(1L, 2L, 100.0);
+	    });
 
-		assertEquals("Account not found: 2", exception.getMessage());
-		verify(contaRepository, times(1)).findById(1L);
-		verify(contaRepository, times(1)).findById(2L);
+	    assertEquals("Account not found: 2", exception.getMessage());
+	    verify(contaRepository, times(1)).findByIdWithLock(1L); 
+	    verify(contaRepository, times(1)).findByIdWithLock(2L);
 	}
 
 }

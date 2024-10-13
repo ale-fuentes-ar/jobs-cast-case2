@@ -59,6 +59,16 @@ link [h2-console][link-h2]
 * pass : 1234
 
 
+## CASE 3
+
+Penso que utilizando acesso a uma mesma conta, em tempo de uso do sistema pode dar varias operações intentem atualizar o saldo.
+Para evitar isso se pode acessar a os registros bloqueando el acesso enquanto esta sendo utilizado 
+
+```java
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Conta> findByIdWithLock(Long id);
+```
+
 
 <!-- links and tools -->
 [link-h2]:http://localhost:8091/h2-console

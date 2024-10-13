@@ -10,6 +10,9 @@ import jakarta.transaction.Transactional;
 @Service
 public class ContaService {
 
+	static final String MSG_CONTA_NAO_EXISTE = "A conta nao existe";
+	static final String MSG_SALDO_INSUFICIENTE = "Saldo insuficiente!";
+	
 	@Autowired
 	private ContaRepository contaRepository;
 
@@ -23,39 +26,43 @@ public class ContaService {
 	
 	@Transactional
 	public Conta visualizarConta(Long id) {
-	    return contaRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found: " + id));
+	    return contaRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("%s: %d", MSG_CONTA_NAO_EXISTE, id)));
 	}
 
 	@Transactional
 	public void creditar(Long id, double valor) {
-		Conta conta = contaRepository.findById(id).orElseThrow();
-		conta.setSaldo(conta.getSaldo() + valor);
-		contaRepository.save(conta);
+		   Conta conta = contaRepository.findByIdWithLock(id)
+		            .orElseThrow(() -> new RuntimeException(String.format("%s: %d", MSG_CONTA_NAO_EXISTE, id)));
+		    conta.setSaldo(conta.getSaldo() + valor);
+		    contaRepository.save(conta);
 	}
 
 	@Transactional
 	public void debitar(Long id, double valor) {
-		Conta conta = contaRepository.findById(id).orElseThrow();
-		if (conta.getSaldo() < valor) {
-			throw new IllegalArgumentException("Saldo insuficiente!");
-		}
-		conta.setSaldo(conta.getSaldo() - valor);
-		contaRepository.save(conta);
+	    Conta conta = contaRepository.findByIdWithLock(id)
+	            .orElseThrow(() -> new RuntimeException(String.format("%s: %d", MSG_CONTA_NAO_EXISTE, id)));
+	    if (conta.getSaldo() < valor) {
+	        throw new IllegalArgumentException(MSG_SALDO_INSUFICIENTE);
+	    }
+	    conta.setSaldo(conta.getSaldo() - valor);
+	    contaRepository.save(conta);
 	}
 
 	@Transactional
 	public void transferir(Long idOrigem, Long idDestino, double valor) {
 		
-		Conta contaOrigem = contaRepository.findById(idOrigem)
-                .orElseThrow(() -> new RuntimeException("Account not found: " + idOrigem));
-        
-		Conta contaDestino = contaRepository.findById(idDestino)
-                .orElseThrow(() -> new RuntimeException("Account not found: " + idDestino));
-		
-		synchronized (this) {
-			debitar(contaOrigem.getId(), valor);
-			creditar(contaDestino.getId(), valor);
-		}
+        Conta contaOrigem = contaRepository.findByIdWithLock(idOrigem)
+                .orElseThrow(() -> new RuntimeException(String.format("%s: %d", MSG_CONTA_NAO_EXISTE, idOrigem)));
+
+        Conta contaDestino = contaRepository.findByIdWithLock(idDestino)
+                .orElseThrow(() -> new RuntimeException(String.format("%s: %d", MSG_CONTA_NAO_EXISTE, idDestino)));
+
+        if (contaOrigem.getSaldo() < valor) {
+            throw new RuntimeException(String.format("%s: %d", MSG_SALDO_INSUFICIENTE, idOrigem));
+        }
+
+        debitar(contaOrigem.getId(), valor);
+        creditar(contaDestino.getId(), valor);
 	}
 
 }
