@@ -8,7 +8,7 @@
 
 #### Requisitos não funcionais
 
-1- Criar operações básicas de manipulação de contas:
+1- Criar operações de manipulação de contas:
 
 * Criar conta.
 * Creditar valor em uma conta.
@@ -61,8 +61,8 @@ link [h2-console][link-h2]
 ---
 ## CASE 3
 
-Penso que utilizando acesso a uma mesma conta, em tempo de uso do sistema pode dar varias operações intentem atualizar o saldo.
-Para evitar isso se pode acessar a os registros bloqueando el acesso enquanto esta sendo utilizado 
+Considero que o acesso a uma mesma conta, durante o uso do sistema, pode resultar em diversas operações que tentam atualizar o saldo simultaneamente. 
+Para evitar essa situação, recomenda-se implementar um bloqueio de acesso aos registros enquanto a conta estiver em uso. Essa medida garantirá a integridade dos dados e a precisão das operações realizadas.
 
 > -- iniciando uma transferencia <br>
 > INFO: **Starting transfer from account 1001 to account 1002 with amount 500.0** <br>
