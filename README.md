@@ -1,4 +1,4 @@
-# Hands-On |  LAB Quarkus 2024
+# CASE | CAST 2024
 <img src="https://img.shields.io/badge/by-Alejandro.Fuentes-informational?style=for-the-badge&logoColor=white&color=004767" alt="" /> <img src="https://img.shields.io/badge/for-CAST_group-informational?style=for-the-badge&logoColor=white&color=004767" alt="" />
 
 <img src="https://img.shields.io/badge/Java_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
