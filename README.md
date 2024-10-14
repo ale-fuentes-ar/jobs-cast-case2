@@ -49,8 +49,6 @@ debitar | POST | POST http://localhost:8091/contas/1/debitar
 > Body (form-data): <br>
 > valor: 50.10
 
-
-
 ## Visualizar H2 console
 
 link [h2-console][link-h2]
@@ -59,10 +57,20 @@ link [h2-console][link-h2]
 * pass : 1234
 
 
+
+---
 ## CASE 3
 
 Penso que utilizando acesso a uma mesma conta, em tempo de uso do sistema pode dar varias operações intentem atualizar o saldo.
 Para evitar isso se pode acessar a os registros bloqueando el acesso enquanto esta sendo utilizado 
+
+> -- iniciando uma transferencia <br>
+> INFO: **Starting transfer from account 1001 to account 1002 with amount 500.0** <br>
+> ERROR: Insufficient funds in account: 1001 <br>
+> INFO: Rolling back transaction due to error <br>
+> -- iniciando uma outra transferencia <br>
+> INFO: **Starting transfer from account 1003 to account 1004 with amount 100.0** <br>
+> ERROR: Could not execute statement; SQL [n/a]; constraint [null]; nested exception is **org.hibernate.exception.ConstraintViolationException**: could not execute statement
 
 ```java
     @Lock(LockModeType.PESSIMISTIC_WRITE)
